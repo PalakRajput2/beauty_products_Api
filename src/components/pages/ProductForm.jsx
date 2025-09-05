@@ -1,9 +1,12 @@
-import React, { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { productSchema } from "../validation/productSchema"
+import React, { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 
-function ProductForm({ formData = {}, setFormData, onSubmit, editingId }) {
+// Validation schema
+import { productSchema } from "../validation/productSchema";
+
+function ProductForm({ formData = {}, onSubmit = () => {}, editingId }) {
   const {
     register,
     handleSubmit,
@@ -14,94 +17,94 @@ function ProductForm({ formData = {}, setFormData, onSubmit, editingId }) {
     defaultValues: formData,
   });
 
-  // Sync the formData when editing
+
+  // Only reset when editing existing product
   useEffect(() => {
-    reset(formData);
+    if (formData && Object.keys(formData).length > 0) {
+      reset(formData);
+    }
   }, [formData, reset]);
-
-  const submitHandler = (data) => {
-    onSubmit(data);
-  };
-
-  const inputClass =
+const inputClass =
     "peer block w-full appearance-none border rounded-md bg-white px-3 pt-4 pb-1 text-gray-900 placeholder-transparent focus:outline-none focus:ring-1 sm:text-sm";
   const errorClass = "text-sm text-red-500 mt-1";
 
   return (
     <form
-      onSubmit={handleSubmit(submitHandler)}
-      className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-gray-50 p-8 rounded-xl shadow-lg border border-gray-200 mb-12"
+      onSubmit={handleSubmit(onSubmit)}
+      className="bg-white shadow-md rounded-lg p-6"
     >
-      {/* Title */}
-      <div className="relative w-full">
-        <input
-          id="title"
-          placeholder="Title"
-          {...register("title")}
-          className={`${inputClass} border-gray-300 focus:border-purple-500 focus:ring-purple-500`}
-        />
-        <label htmlFor="title" className="form-label">Product Title</label>
-        {errors.title && <p className={errorClass}>{errors.title.message}</p>}
-      </div>
+      <h2 className="text-xl font-semibold mb-4">
+        {editingId ? "Edit Product" : "Add Product"}
+      </h2>
 
-      {/* Price */}
-      <div className="relative w-full">
-        <input
-          id="price"
-          type="number"
-          placeholder="Price"
-          {...register("price")}
-          className={`${inputClass} border-gray-300 focus:border-purple-500 focus:ring-purple-500`}
-        />
-        <label htmlFor="price" className="form-label">Price ($)</label>
-        {errors.price && <p className={errorClass}>{errors.price.message}</p>}
-      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block mb-1 font-medium">Title</label>
+          <input
+            {...register("title")}
+            className="w-full border p-2 rounded"
+            placeholder="Enter product title"
+          />
+          {errors.title && (
+            <p className="text-red-500 text-sm">{errors.title.message}</p>
+          )}
+        </div>
 
-      {/* Brand */}
-      <div className="relative w-full">
-        <input
-          id="brand"
-          placeholder="Brand"
-          {...register("brand")}
-          className={`${inputClass} border-gray-300 focus:border-purple-500 focus:ring-purple-500`}
-        />
-        <label htmlFor="brand" className="form-label">Brand</label>
-        {errors.brand && <p className={errorClass}>{errors.brand.message}</p>}
-      </div>
+        <div>
+          <label className="block mb-1 font-medium">Price</label>
+          <input
+            type="number"
+            {...register("price")}
+            className="w-full border p-2 rounded"
+            placeholder="Enter price"
+          />
+          {errors.price && (
+            <p className="text-red-500 text-sm">{errors.price.message}</p>
+          )}
+        </div>
 
-      {/* Category */}
-      <div className="relative w-full">
-        <input
-          id="category"
-          placeholder="Category"
-          {...register("category")}
-          className={`${inputClass} border-gray-300 focus:border-purple-500 focus:ring-purple-500`}
-        />
-        <label htmlFor="category" className="form-label">Category</label>
-        {errors.category && <p className={errorClass}>{errors.category.message}</p>}
-      </div>
+        <div>
+          <label className="block mb-1 font-medium">Category</label>
+          <input
+            {...register("category")}
+            className="w-full border p-2 rounded"
+            placeholder="Enter category"
+          />
+          {errors.category && (
+            <p className="text-red-500 text-sm">{errors.category.message}</p>
+          )}
+        </div>
 
-      {/* Thumbnail */}
+        <div>
+          <label className="block mb-1 font-medium">Brand</label>
+          <input
+            {...register("brand")}
+            className="w-full border p-2 rounded"
+            placeholder="Enter brand"
+          />
+          {errors.brand && (
+            <p className="text-red-500 text-sm">{errors.brand.message}</p>
+          )}
+        </div>
+           {/* Thumbnail */}
       <div className="relative w-full sm:col-span-2">
         <input
           id="thumbnail"
           placeholder="Thumbnail URL"
           {...register("thumbnail")}
-          className={`${inputClass} border-gray-300 focus:border-purple-500 focus:ring-purple-500`}
+          className={`${inputClass}  border p-2 rounded`}
         />
-        <label htmlFor="thumbnail" className="form-label">Thumbnail URL</label>
+        <label htmlFor="thumbnail" className="form-label ">Thumbnail URL</label>
         {errors.thumbnail && <p className={errorClass}>{errors.thumbnail.message}</p>}
       </div>
-
-      {/* Submit Button */}
-      <div className="sm:col-span-2 flex justify-center items-center">
-        <button
-          type="submit"
-          className="w-full max-w-xs bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-md transition-colors cursor-pointer"
-        >
-          {editingId ? "Update Product" : "Add Product"}
-        </button>
       </div>
+
+      <button
+        type="submit"
+        className="mt-4 bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600"
+      >
+        {editingId ? "Update Product" : "Add Product"}
+      </button>
     </form>
   );
 }
