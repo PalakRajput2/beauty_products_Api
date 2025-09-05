@@ -1,31 +1,31 @@
-import axios from 'axios';
+// src/api/api.js
+import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = "https://dummyjson.com/products"; // adjust your backend
 
-// Fetch products with pagination
-export const fetchProducts = async ({ page = 1, limit = 10 }) => {
-  const skip = (page - 1) * limit;
-  const { data } = await axios.get(`${API_URL}?limit=${limit}&skip=${skip}`);
+// GET products
+export const fetchProducts = async ({ page, limit }) => {
+  const res = await axios.get(`${API_URL}?_page=${page}&_limit=${limit}`);
   return {
-    products: data.products,
-    total: data.total,
-    limit: data.limit,
-    skip: data.skip,
+    products: res.data,
+    total: parseInt(res.headers["x-total-count"], 10), // json-server style
   };
 };
 
-
-export const addProduct = async (product) => {
-  const { data } = await axios.post(API_URL, product);
-  return data;
+// CREATE product
+export const createProduct = async (product) => {
+  const res = await axios.post(API_URL, product);
+  return res.data;
 };
 
+// UPDATE product
+export const updateProduct = async (id, data) => {
+  const res = await axios.put(`${API_URL}/${id}`, data);
+  return res.data;
+};
+
+// DELETE product
 export const deleteProduct = async (id) => {
-  const { data } = await axios.delete(`${API_URL}/${id}`);
-  return data;
-};
-
-export const updateProduct = async ({ id, updatedProduct }) => {
-  const { data } = await axios.put(`${API_URL}/${id}`, updatedProduct);
-  return data;
+  await axios.delete(`${API_URL}/${id}`);
+  return id;
 };
